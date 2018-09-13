@@ -77,6 +77,8 @@ import { Dimension } from 'vs/base/browser/dom';
 import { ILogService, LogLevel } from 'vs/platform/log/common/log';
 import { ILabelService, LabelService } from 'vs/platform/label/common/label';
 import { timeout } from 'vs/base/common/async';
+import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
+import { IContextMenuDelegate } from 'vs/base/browser/contextmenu';
 
 export function createFileInput(instantiationService: IInstantiationService, resource: URI): FileEditorInput {
 	return instantiationService.createInstance(FileEditorInput, resource, void 0);
@@ -1381,4 +1383,14 @@ export class TestHashService implements IHashService {
 
 export function getRandomTestPath(tmpdir: string, ...segments: string[]): string {
 	return paths.join(tmpdir, ...segments, generateUuid());
+}
+
+export class TestContextMenuService implements IContextMenuService {
+	_serviceBrand: any;
+
+	onDidContextMenu: Event<void> = Event.None;
+
+	isVisible: boolean;
+
+	showContextMenu(delegate: IContextMenuDelegate): void { }
 }

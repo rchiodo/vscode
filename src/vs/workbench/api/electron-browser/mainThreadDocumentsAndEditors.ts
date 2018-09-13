@@ -26,6 +26,7 @@ import { IEditorService } from 'vs/workbench/services/editor/common/editorServic
 import { isDiffEditor, ICodeEditor } from 'vs/editor/browser/editorBrowser';
 import { URI } from 'vs/base/common/uri';
 import { IBulkEditService } from 'vs/editor/browser/services/bulkEditService';
+import { IContextMenuService } from 'vs/platform/contextview/browser/contextView';
 
 namespace mapset {
 
@@ -161,7 +162,8 @@ class MainThreadDocumentAndEditorStateComputer {
 		private readonly _onDidChangeState: (delta: DocumentAndEditorStateDelta) => void,
 		@IModelService private readonly _modelService: IModelService,
 		@ICodeEditorService private readonly _codeEditorService: ICodeEditorService,
-		@IEditorService private readonly _editorService: IEditorService
+		@IEditorService private readonly _editorService: IEditorService,
+		@IContextMenuService private readonly _contextMenuService: IContextMenuService
 	) {
 		this._modelService.onModelAdded(this._updateStateOnModelAdd, this, this._toDispose);
 		this._modelService.onModelRemoved(this._updateState, this, this._toDispose);
@@ -180,7 +182,12 @@ class MainThreadDocumentAndEditorStateComputer {
 	private _onDidAddEditor(e: ICodeEditor): void {
 		this._toDisposeOnEditorRemove.set(e.getId(), e.onDidChangeModel(() => this._updateState()));
 		this._toDisposeOnEditorRemove.set(e.getId(), e.onDidFocusEditorText(() => this._updateState()));
-		this._toDisposeOnEditorRemove.set(e.getId(), e.onDidBlurEditorText(() => this._updateState()));
+		this._toDisposeOnEditorRemove.set(e.getId(), e.onDidBlurEditorText(() => {
+			// Workaround for https://github.com/Microsoft/vscode/issues/55309
+			if (!this._contextMenuService.isVisible) {
+				this._updateState();
+			}
+		}));
 		this._updateState();
 	}
 
@@ -307,7 +314,8 @@ export class MainThreadDocumentsAndEditors {
 		@ITextModelService textModelResolverService: ITextModelService,
 		@IUntitledEditorService untitledEditorService: IUntitledEditorService,
 		@IEditorGroupsService private readonly _editorGroupService: IEditorGroupsService,
-		@IBulkEditService bulkEditService: IBulkEditService
+		@IBulkEditService bulkEditService: IBulkEditService,
+		@IContextMenuService contextMenuService: IContextMenuService
 
 	) {
 		this._proxy = extHostContext.getProxy(ExtHostContext.ExtHostDocumentsAndEditors);
@@ -319,7 +327,7 @@ export class MainThreadDocumentsAndEditors {
 		extHostContext.set(MainContext.MainThreadTextEditors, mainThreadTextEditors);
 
 		// It is expected that the ctor of the state computer calls our `_onDelta`.
-		this._stateComputer = new MainThreadDocumentAndEditorStateComputer(delta => this._onDelta(delta), _modelService, codeEditorService, this._editorService);
+		this._stateComputer = new MainThreadDocumentAndEditorStateComputer(delta => this._onDelta(delta), _modelService, codeEditorService, this._editorService, contextMenuService);
 
 		this._toDispose = [
 			mainThreadDocuments,

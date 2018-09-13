@@ -49,6 +49,10 @@ export class ContextMenuHandler {
 		}
 	}
 
+	public isVisible(): boolean {
+		return !!this.menuContainerElement;
+	}
+
 	public showContextMenu(delegate: IContextMenuDelegate): void {
 		delegate.getActions().then((actions: IAction[]) => {
 			if (!actions.length) {
@@ -92,11 +96,11 @@ export class ContextMenuHandler {
 				},
 
 				onHide: (didCancel?: boolean) => {
+					this.menuContainerElement = null;
+
 					if (delegate.onHide) {
 						delegate.onHide(didCancel);
 					}
-
-					this.menuContainerElement = null;
 				}
 			});
 		});

@@ -29,6 +29,8 @@ export class ContextMenuService extends Disposable implements IContextMenuServic
 	private _onDidContextMenu = this._register(new Emitter<void>());
 	get onDidContextMenu(): Event<void> { return this._onDidContextMenu.event; }
 
+	private _isVisible: boolean;
+
 	constructor(
 		@INotificationService private notificationService: INotificationService,
 		@ITelemetryService private telemetryService: ITelemetryService,
@@ -37,10 +39,18 @@ export class ContextMenuService extends Disposable implements IContextMenuServic
 		super();
 	}
 
+	get isVisible(): boolean {
+		return this._isVisible;
+	}
+
 	showContextMenu(delegate: IContextMenuDelegate): void {
 		delegate.getActions().then(actions => {
 			if (actions.length) {
+				this._isVisible = true;
+
 				const onHide = once(() => {
+					this._isVisible = false;
+
 					if (delegate.onHide) {
 						delegate.onHide(undefined);
 					}

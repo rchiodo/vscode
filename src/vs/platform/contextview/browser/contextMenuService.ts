@@ -11,7 +11,6 @@ import { Event, Emitter } from 'vs/base/common/event';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IContextMenuDelegate } from 'vs/base/browser/contextmenu';
 
-
 export class ContextMenuService implements IContextMenuService {
 	public _serviceBrand: any;
 
@@ -20,6 +19,10 @@ export class ContextMenuService implements IContextMenuService {
 
 	constructor(container: HTMLElement, telemetryService: ITelemetryService, notificationService: INotificationService, contextViewService: IContextViewService) {
 		this.contextMenuHandler = new ContextMenuHandler(container, contextViewService, telemetryService, notificationService);
+	}
+
+	public get isVisible(): boolean {
+		return this.contextMenuHandler.isVisible();
 	}
 
 	public dispose(): void {

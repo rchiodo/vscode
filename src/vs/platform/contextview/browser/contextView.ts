@@ -12,9 +12,12 @@ import { IContextMenuDelegate } from 'vs/base/browser/contextmenu';
 export const IContextViewService = createDecorator<IContextViewService>('contextViewService');
 
 export interface IContextViewService {
+
 	_serviceBrand: any;
+
 	showContextView(delegate: IContextViewDelegate): void;
 	hideContextView(data?: any): void;
+
 	layout(): void;
 }
 
@@ -30,7 +33,9 @@ export const IContextMenuService = createDecorator<IContextMenuService>('context
 
 export interface IContextMenuService {
 	_serviceBrand: any;
+
+	onDidContextMenu: Event<void>; // TODO@isidor these event should be removed once we get async context menus
+	isVisible: boolean;
+
 	showContextMenu(delegate: IContextMenuDelegate): void;
-	// TODO@isidor these event should be removed once we get async context menus
-	onDidContextMenu: Event<void>;
 }

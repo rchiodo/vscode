@@ -21,7 +21,7 @@ import { Range } from 'vs/editor/common/core/range';
 import { Position } from 'vs/editor/common/core/position';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { EditOperation } from 'vs/editor/common/core/editOperation';
-import { TestFileService, TestEditorService, TestEditorGroupsService, TestEnvironmentService, TestContextService } from 'vs/workbench/test/workbenchTestServices';
+import { TestFileService, TestEditorService, TestEditorGroupsService, TestEnvironmentService, TestContextService, TestContextMenuService } from 'vs/workbench/test/workbenchTestServices';
 import { TPromise } from 'vs/base/common/winjs.base';
 import { ResourceTextEdit } from 'vs/editor/common/modes';
 import { BulkEditService } from 'vs/workbench/services/bulkEdit/electron-browser/bulkEditService';
@@ -96,6 +96,8 @@ suite('MainThreadEditors', () => {
 			}
 		});
 
+		const contextMenuService = new TestContextMenuService();
+
 		const documentAndEditor = new MainThreadDocumentsAndEditors(
 			rpcProtocol,
 			modelService,
@@ -108,6 +110,7 @@ suite('MainThreadEditors', () => {
 			null,
 			editorGroupService,
 			bulkEditService,
+			contextMenuService
 		);
 
 		editors = new MainThreadTextEditors(
