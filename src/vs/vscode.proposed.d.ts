@@ -1527,17 +1527,13 @@ declare module 'vscode' {
 
 	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput & { metadata: { [key: string]: any} }; // Metadata can be put here by an execution so that a renderer can use it
 
-	export interface NotebookExecutionInfo {
-		data: { [key: string]: any}
-	}
-
 	export interface NotebookCell {
 		readonly uri: Uri;
 		handle: number;
 		language: string;
 		cellKind: CellKind;
 		outputs: CellOutput[];
-		executionInfo: NotebookExecutionInfo;
+        	metadata: { [key: string]: any }
 		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it?
 	}
 
@@ -1547,7 +1543,7 @@ declare module 'vscode' {
 		readonly isDirty: boolean;
 		languages: string[];
 		cells: NotebookCell[];
-		rootExecutionInfo: NotebookExecutionInfo;
+		metadata: { [key: string]: any }
 		displayOrder?: GlobPattern[];
 	}
 
