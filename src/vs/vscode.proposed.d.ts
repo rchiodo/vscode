@@ -1533,7 +1533,7 @@ declare module 'vscode' {
 		language: string;
 		cellKind: CellKind;
 		outputs: CellOutput[];
-        	metadata: { [key: string]: any }
+        metadata: { [key: string]: any }
 		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it?
 	}
 
