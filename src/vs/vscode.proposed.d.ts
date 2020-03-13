@@ -1472,7 +1472,8 @@ declare module 'vscode' {
 
 	export enum CellKind {
 		Markdown = 1,
-		Code = 2
+		Code = 2,
+		Raw = 3
 	}
 
 	export enum CellOutputKind {
@@ -1524,7 +1525,11 @@ declare module 'vscode' {
 		data: { [key: string]: any };
 	}
 
-	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput;
+	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput & { metadata: { [key: string]: any} }; // Metadata can be put here by an execution so that a renderer can use it
+
+	export interface NotebookExecutionInfo {
+		data: { [key: string]: any}
+	}
 
 	export interface NotebookCell {
 		readonly uri: Uri;
@@ -1532,7 +1537,8 @@ declare module 'vscode' {
 		language: string;
 		cellKind: CellKind;
 		outputs: CellOutput[];
-		getContent(): string;
+		executionInfo: NotebookExecutionInfo;
+		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it?
 	}
 
 	export interface NotebookDocument {
@@ -1541,6 +1547,7 @@ declare module 'vscode' {
 		readonly isDirty: boolean;
 		languages: string[];
 		cells: NotebookCell[];
+		rootExecutionInfo: NotebookExecutionInfo;
 		displayOrder?: GlobPattern[];
 	}
 
@@ -1554,14 +1561,62 @@ declare module 'vscode' {
 	}
 
 	export interface NotebookProvider {
-		resolveNotebook(editor: NotebookEditor): Promise<void>;
-		executeCell(document: NotebookDocument, cell: NotebookCell | undefined): Promise<void>;
+		resolveNotebook(editor: NotebookEditor): Promise<void>; // rchiodo: Not sure what this is for? Notebook is loaded? Like prime the server? Or does this somehow generate the document?
 		save(document: NotebookDocument): Promise<boolean>;
+	}
+
+	/**
+	 * Result of an executeCell.
+	 */
+	export interface NotebookCellExecutionResult {
+		/**
+		 * Event fired when new cell output comes through
+		 */
+		readonly onCellOutput: Event<CellOutput[]>;
+		/**
+		 * Event fired when output should be cleared. Boolean flag indicates if should wait for next onOutput for clear.
+		 */
+		readonly onClear: Event< boolean>;
+		/**
+		 * Event fired when document wide output comes through
+		 */
+		readonly onDocumentOutput: Event<CellOutput[]>;
+		/**
+		 * Event fired when execution is complete
+		 */
+		readonly onComplete: Event<void>;
+	}
+
+	/**
+	 * Allows execution of notebook cells.
+	 */
+	export interface NotebookExecution {
+		readonly executionCount: number;
+		executeCell(document: NotebookDocument, cell: NotebookCell): NotebookCellExecutionResult;
+	}
+
+	/**
+	 * Allows observing the execution of cells from a NotebookExecution
+	 */
+	export interface NotebookExecutionObserver {
+		onExecuteCell(document: NotebookDocument, cell: NotebookCell, eventProvider: NotebookCellExecutionResult): void;
 	}
 
 	export interface NotebookOutputSelector {
 		type: string;
 		subTypes?: string[];
+	}
+
+	/**
+	 * Allows transformation of output from raw execution. Called during execution.
+	 */
+	export interface NotebookOutputTransformer {
+		/**
+		 *
+		 * @returns the next item in the chain
+		 *
+		 */
+		transformOutput(document: NotebookDocument, cell: NotebookCell, output: CellOutput): CellOutput;
 	}
 
 	export interface NotebookOutputRenderer {
@@ -1571,7 +1626,7 @@ declare module 'vscode' {
 		 *
 		 */
 		render(document: NotebookDocument, cell: NotebookCell, output: CellOutput, mimeType: string): string;
-		preloads?: Uri[];
+		preloads?: Uri[]; // rchiodo: What is this for?
 	}
 
 	namespace window {
@@ -1580,7 +1635,23 @@ declare module 'vscode' {
 			provider: NotebookProvider
 		): Disposable;
 
-		export function registerNotebookOutputRenderer(type: string, outputSelector: NotebookOutputSelector, renderer: NotebookOutputRenderer): Disposable;
+		export function registerNotebookExecution(
+			execution: NotebookExecution
+		): Disposable;
+
+		export function registerNotebookExecutionObserver(
+			observer: NotebookExecutionObserver
+		): Disposable;
+
+		export function registerNotebookOutputRenderer(
+			outputSelector: NotebookOutputSelector,
+			renderer: NotebookOutputRenderer
+		): Disposable;
+
+		export function registerNotebookOutputTransformer(
+			outputSelector: NotebookOutputSelector,
+			transformer: NotebookOutputTransformer
+		): Disposable;
 
 		export let activeNotebookDocument: NotebookDocument | undefined;
 	}
