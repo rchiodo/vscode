@@ -1533,8 +1533,9 @@ declare module 'vscode' {
 		language: string;
 		cellKind: CellKind;
 		outputs: CellOutput[];
-        metadata: { [key: string]: any }
-		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it?
+		metadata: { [key: string]: any }
+		source: string;
+		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it? Is this the source?
 	}
 
 	export interface NotebookDocument {
