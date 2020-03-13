@@ -1595,7 +1595,11 @@ declare module 'vscode' {
 	 * Allows observing the execution of cells from a NotebookExecution
 	 */
 	export interface NotebookExecutionObserver {
-		onExecuteCell(document: NotebookDocument, cell: NotebookCell, eventProvider: NotebookCellExecutionResult): void;
+		onExecuteStart(document: NotebookDocument, cell: NotebookCell): void;
+		onCellOutput(document: NotebookDocument, cell: NotebookCell, outputs: CellOutput[]): void;
+		onCellClear(document: NotebookDocument, cell: NotebookCell, wait: boolean): void;
+		onDocumentOutput(document: NotebookDocument, cell: NotebookCell, outputs: CellOutput[]): void;
+		onExecuteComplete(document: NotebookDocument, cell: NotebookCell, executionCount: number): void;
 	}
 
 	export interface NotebookOutputSelector {
