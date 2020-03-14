@@ -1538,6 +1538,12 @@ declare module 'vscode' {
 		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it? Is this the source?
 	}
 
+	export interface NotebookExecutionInfo {
+		name: string;
+		display_name: string;
+		metadata: { [key: string]: any }
+	}
+
 	export interface NotebookDocument {
 		readonly uri: Uri;
 		readonly fileName: string;
@@ -1545,6 +1551,7 @@ declare module 'vscode' {
 		languages: string[];
 		cells: NotebookCell[];
 		metadata: { [key: string]: any }
+		executionInfo: NotebookExecutionInfo;
 		displayOrder?: GlobPattern[];
 	}
 
