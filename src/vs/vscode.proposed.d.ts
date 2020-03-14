@@ -1540,7 +1540,6 @@ declare module 'vscode' {
 
 	export interface NotebookExecutionInfo {
 		name: string;
-		display_name: string;
 		metadata: { [key: string]: any }
 	}
 
