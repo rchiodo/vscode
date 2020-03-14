@@ -1533,7 +1533,6 @@ declare module 'vscode' {
 		language: string;
 		cellKind: CellKind;
 		outputs: CellOutput[];
-		metadata: { [key: string]: any }
 		source: string;
 		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it? Is this the source?
 	}
@@ -1549,7 +1548,6 @@ declare module 'vscode' {
 		readonly isDirty: boolean;
 		languages: string[];
 		cells: NotebookCell[];
-		metadata: { [key: string]: any }
 		executionInfo: NotebookExecutionInfo;
 		displayOrder?: GlobPattern[];
 	}
