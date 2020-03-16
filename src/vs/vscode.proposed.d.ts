@@ -1587,7 +1587,14 @@ declare module 'vscode' {
 	}
 
 	export interface NotebookOutputRenderer {
+		/**
+		 * Event is fired when the extension wants to send a message to the HTML loaded into the webview
+		 */
 		readonly postMessage: Event<any>;
+		/**
+		 *
+		 * @param message Called when the HTML in the webview is sending a message
+		 */
 		onMessage(message: any): void;
 		/**
 		 *
