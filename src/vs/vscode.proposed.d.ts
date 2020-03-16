@@ -1533,8 +1533,7 @@ declare module 'vscode' {
 		language: string;
 		cellKind: CellKind;
 		outputs: CellOutput[];
-		source: string;
-		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it? Is this the source?
+		getContent(): string;
 	}
 
 	export interface NotebookKernel {
@@ -1561,7 +1560,7 @@ declare module 'vscode' {
 	}
 
 	export interface NotebookProvider {
-		resolveNotebook(editor: NotebookEditor): Promise<void>; // rchiodo: Not sure what this is for? Notebook is loaded? Like prime the server? Or does this somehow generate the document?
+		resolveNotebook(editor: NotebookEditor): Promise<void>;
 		save(document: NotebookDocument): Promise<boolean>;
 	}
 
@@ -1593,7 +1592,7 @@ declare module 'vscode' {
 		 *
 		 */
 		render(document: NotebookDocument, cell: NotebookCell, output: CellOutput, mimeType: string): string;
-		preloads?: Uri[]; // rchiodo: What is this for?
+		preloads?: Uri[];
 	}
 
 	namespace window {
