@@ -1472,7 +1472,8 @@ declare module 'vscode' {
 
 	export enum CellKind {
 		Markdown = 1,
-		Code = 2
+		Code = 2,
+		Raw = 3
 	}
 
 	export enum CellOutputKind {
@@ -1524,7 +1525,7 @@ declare module 'vscode' {
 		data: { [key: string]: any };
 	}
 
-	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput;
+	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput
 
 	export interface NotebookCell {
 		readonly uri: Uri;
@@ -1533,6 +1534,11 @@ declare module 'vscode' {
 		cellKind: CellKind;
 		outputs: CellOutput[];
 		getContent(): string;
+	}
+
+	export interface NotebookKernel {
+		readonly executionCount: number;
+		executeCode(code: string) : Promise<CellOutput[]>
 	}
 
 	export interface NotebookDocument {
@@ -1555,8 +1561,24 @@ declare module 'vscode' {
 
 	export interface NotebookProvider {
 		resolveNotebook(editor: NotebookEditor): Promise<void>;
-		executeCell(document: NotebookDocument, cell: NotebookCell | undefined): Promise<void>;
 		save(document: NotebookDocument): Promise<boolean>;
+
+	}
+
+	/**
+	 * Allows execution of notebook cells.
+	 */
+	export interface NotebookExecution {
+		readonly kernel: NotebookKernel;
+		executeCell(document: NotebookDocument, cell: NotebookCell): Promise<void>;
+
+	}
+
+	/**
+	 * Allows observing the execution of cells from a NotebookExecution
+	 */
+	export interface NotebookExecutionObserver {
+		onExecuteCell(document: NotebookDocument, cell: NotebookCell, kernel: NotebookKernel): void;
 	}
 
 	export interface NotebookOutputSelector {
@@ -1565,6 +1587,15 @@ declare module 'vscode' {
 	}
 
 	export interface NotebookOutputRenderer {
+		/**
+		 * Event is fired when the extension wants to send a message to the HTML loaded into the webview
+		 */
+		readonly postMessage: Event<any>;
+		/**
+		 *
+		 * @param message Called when the HTML in the webview is sending a message
+		 */
+		onMessage(message: any): void;
 		/**
 		 *
 		 * @returns HTML fragment. We can probably return `CellOutput` instead of string ?
@@ -1580,7 +1611,18 @@ declare module 'vscode' {
 			provider: NotebookProvider
 		): Disposable;
 
-		export function registerNotebookOutputRenderer(type: string, outputSelector: NotebookOutputSelector, renderer: NotebookOutputRenderer): Disposable;
+		export function registerNotebookExecution(
+			execution: NotebookExecution
+		): Disposable;
+
+		export function registerNotebookExecutionObserver(
+			observer: NotebookExecutionObserver
+		): Disposable;
+
+		export function registerNotebookOutputRenderer(
+			outputSelector: NotebookOutputSelector,
+			renderer: NotebookOutputRenderer
+		): Disposable;
 
 		export let activeNotebookDocument: NotebookDocument | undefined;
 	}
