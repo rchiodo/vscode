@@ -1562,6 +1562,7 @@ declare module 'vscode' {
 	export interface NotebookProvider {
 		resolveNotebook(editor: NotebookEditor): Promise<void>;
 		save(document: NotebookDocument): Promise<boolean>;
+
 	}
 
 	/**
@@ -1586,6 +1587,8 @@ declare module 'vscode' {
 	}
 
 	export interface NotebookOutputRenderer {
+		readonly postMessage: Event<any>;
+		onMessage(message: any): void;
 		/**
 		 *
 		 * @returns HTML fragment. We can probably return `CellOutput` instead of string ?
