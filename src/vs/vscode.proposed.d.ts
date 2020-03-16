@@ -1525,7 +1525,7 @@ declare module 'vscode' {
 		data: { [key: string]: any };
 	}
 
-	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput & { metadata: { [key: string]: any} }; // Metadata can be put here by an execution so that a renderer can use it
+	export type CellOutput = CellStreamOutput | CellErrorOutput | CellDisplayOutput
 
 	export interface NotebookCell {
 		readonly uri: Uri;
@@ -1537,9 +1537,9 @@ declare module 'vscode' {
 		getContent(): string; // rchiodo: This seems weird? Why does this have methods on it? Is this the source?
 	}
 
-	export interface NotebookExecutionInfo {
-		name: string;
-		metadata: { [key: string]: any }
+	export interface NotebookKernel {
+		readonly executionCount: number;
+		executeCode(code: string) : Promise<CellOutput[]>
 	}
 
 	export interface NotebookDocument {
@@ -1548,7 +1548,6 @@ declare module 'vscode' {
 		readonly isDirty: boolean;
 		languages: string[];
 		cells: NotebookCell[];
-		executionInfo: NotebookExecutionInfo;
 		displayOrder?: GlobPattern[];
 	}
 
@@ -1567,61 +1566,24 @@ declare module 'vscode' {
 	}
 
 	/**
-	 * Result of an executeCell.
-	 */
-	export interface NotebookCellExecutionResult {
-		/**
-		 * Event fired when new cell output comes through
-		 */
-		readonly onCellOutput: Event<CellOutput[]>;
-		/**
-		 * Event fired when output should be cleared. Boolean flag indicates if should wait for next onOutput for clear.
-		 */
-		readonly onClear: Event< boolean>;
-		/**
-		 * Event fired when document wide output comes through
-		 */
-		readonly onDocumentOutput: Event<CellOutput[]>;
-		/**
-		 * Event fired when execution is complete
-		 */
-		readonly onComplete: Event<void>;
-	}
-
-	/**
 	 * Allows execution of notebook cells.
 	 */
 	export interface NotebookExecution {
-		readonly executionCount: number;
-		executeCell(document: NotebookDocument, cell: NotebookCell): NotebookCellExecutionResult;
+		readonly kernel: NotebookKernel;
+		executeCell(document: NotebookDocument, cell: NotebookCell): Promise<void>;
+
 	}
 
 	/**
 	 * Allows observing the execution of cells from a NotebookExecution
 	 */
 	export interface NotebookExecutionObserver {
-		onExecuteStart(document: NotebookDocument, cell: NotebookCell): void;
-		onCellOutput(document: NotebookDocument, cell: NotebookCell, outputs: CellOutput[]): void;
-		onCellClear(document: NotebookDocument, cell: NotebookCell, wait: boolean): void;
-		onDocumentOutput(document: NotebookDocument, cell: NotebookCell, outputs: CellOutput[]): void;
-		onExecuteComplete(document: NotebookDocument, cell: NotebookCell, executionCount: number): void;
+		onExecuteCell(document: NotebookDocument, cell: NotebookCell, kernel: NotebookKernel): void;
 	}
 
 	export interface NotebookOutputSelector {
 		type: string;
 		subTypes?: string[];
-	}
-
-	/**
-	 * Allows transformation of output from raw execution. Called during execution.
-	 */
-	export interface NotebookOutputTransformer {
-		/**
-		 *
-		 * @returns the next item in the chain
-		 *
-		 */
-		transformOutput(document: NotebookDocument, cell: NotebookCell, output: CellOutput): CellOutput;
 	}
 
 	export interface NotebookOutputRenderer {
@@ -1651,11 +1613,6 @@ declare module 'vscode' {
 		export function registerNotebookOutputRenderer(
 			outputSelector: NotebookOutputSelector,
 			renderer: NotebookOutputRenderer
-		): Disposable;
-
-		export function registerNotebookOutputTransformer(
-			outputSelector: NotebookOutputSelector,
-			transformer: NotebookOutputTransformer
 		): Disposable;
 
 		export let activeNotebookDocument: NotebookDocument | undefined;
