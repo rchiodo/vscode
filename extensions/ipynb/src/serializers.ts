@@ -295,26 +295,34 @@ function convertOutputMimeToJupyterOutput(mime: string, value: Uint8Array) {
 		return '';
 	}
 	try {
+		let result: string | string[] = '';
 		if (mime === CellOutputMimeTypes.error) {
 			const stringValue = textDecoder.decode(value);
-			return JSON.parse(stringValue);
+			result = JSON.parse(stringValue);
 		} else if (mime.startsWith('text/') || textMimeTypes.includes(mime)) {
 			const stringValue = textDecoder.decode(value);
-			return splitMultilineString(stringValue);
+			result = splitMultilineString(stringValue);
 		} else if (mime.startsWith('image/') && mime !== 'image/svg+xml') {
 			// Images in Jupyter are stored in base64 encoded format.
 			// VS Code expects bytes when rendering images.
 			if (typeof Buffer !== 'undefined' && typeof Buffer.from === 'function') {
-				return Buffer.from(value).toString('base64');
+				result = Buffer.from(value).toString('base64');
 			} else {
-				return btoa(value.reduce((s: string, b: number) => s + String.fromCharCode(b), ''));
+				result = btoa(value.reduce((s: string, b: number) => s + String.fromCharCode(b), ''));
 			}
 		} else if (mime.toLowerCase().includes('json')) {
 			const stringValue = textDecoder.decode(value);
-			return stringValue.length > 0 ? JSON.parse(stringValue) : stringValue;
+			result = stringValue.length > 0 ? JSON.parse(stringValue) : stringValue;
 		} else {
 			const stringValue = textDecoder.decode(value);
-			return stringValue;
+			result = stringValue;
+		}
+
+		// Jupyter always ends with a \n. Make sure to put one on the output
+		if (Array.isArray(result) || result.endsWith('\n')) {
+			return result;
+		} else {
+			return `${result}\n`;
 		}
 	} catch (ex) {
 		return '';
