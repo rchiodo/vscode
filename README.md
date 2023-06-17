@@ -1,9 +1,20 @@
+### Table of contents
+1. [The Repository](https://github.com/rchiodo/vscode/edit/main/README.md#the%20repository)
+2. [Contributing](#contributing)
+3. [Feedback](#feedback)
+4. [Related Projects](https://github.com/rchiodo/vscode/edit/main/README.md#Related%20Projects)
+5. [Bundled Extensions](https://github.com/rchiodo/vscode/edit/main/README.md#Bundled%20Extensions)
+6. [Development Container](https://github.com/rchiodo/vscode/edit/main/README.md#Development%20Container)
+7. [Code of Conduct](https://github.com/rchiodo/vscode/edit/main/README.md#Code%20of%20Conduct)
+8. [License](https://github.com/rchiodo/vscode/edit/main/README.md#License)
+
+
 # Visual Studio Code - Open Source ("Code - OSS")
 [![Feature Requests](https://img.shields.io/github/issues/microsoft/vscode/feature-request.svg)](https://github.com/microsoft/vscode/issues?q=is%3Aopen+is%3Aissue+label%3Afeature-request+sort%3Areactions-%2B1-desc)
 [![Bugs](https://img.shields.io/github/issues/microsoft/vscode/bug.svg)](https://github.com/microsoft/vscode/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3Abug)
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-yellow.svg)](https://gitter.im/Microsoft/vscode)
 
-## The Repository
+# The Repository
 
 This repository ("`Code - OSS`") is where we (Microsoft) develop the [Visual Studio Code](https://code.visualstudio.com) product together with the community. Not only do we work on code and issues here, we also publish our [roadmap](https://github.com/microsoft/vscode/wiki/Roadmap), [monthly iteration plans](https://github.com/microsoft/vscode/wiki/Iteration-Plans), and our [endgame plans](https://github.com/microsoft/vscode/wiki/Running-the-Endgame). This source code is available to everyone under the standard [MIT license](https://github.com/microsoft/vscode/blob/main/LICENSE.txt).
 
